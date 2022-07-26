@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- socket.io 모듈은 내부적루트 "루트/socket.io"이 경로에
+    socket.io.js 파일을 자동으로 등록
+불러온 스크립트는 localhohst:3000에 접근하여 js 스크립트를 불러오게 된다-->
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div>첫페이지</div>
+    <input type="text" id="text" />
+    <input type="text" id="user" />
+    <button id="button"></button>
+</body>
+<script>
+    window.onload = () =>{
+        const socket = io.connect();
+        socket.on('hi',(data)=> {
+            alert(data);
+        });
+        button.onclick = () => {
+            const msg = text.value;
+            const id = user.value;
+            socket.emit("hi",{msg,id});
+        };
+    };
+</script>
+</html>
