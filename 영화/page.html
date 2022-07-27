@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .line{
+            overflow: hidden;
+        }
+        .seat {
+            margin: 2px;
+            float: left;
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            border: solid black;
+        }
+        .enable{
+            background-color: gray;
+        }
+        .enable:hover{
+            background-color: rgb(212, 194, 171);
+        }
+        .disable{
+            background-color: red;
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+</head>
+<body>
+    <div>영화관</div>
+</body>
+<script>
+    // 아작스 사용
+    const socket = io.connect();
+    socket.on('reserver',(data)=>{
+        let $target = $("div[data-x= "+data.x+"][data-y =" + data.y +"]");
+        target.removeClass('enable');
+        target.addClass("disable");
+    });
+
+    // 초기 좌석 생성
+
+    $(window).ready(function(){
+        const onClickSeat = function(){
+            // $() 괄호안에 있는 dom 객체를 제이쿼리 객체로 바꿔준다
+          //  document.querySelector(this).classList.
+            if($(this).hasClass('disable')){
+                return;
+            }
+            // 좌석을 클릭하면 이벤트가 발생한 좌석의 data-x data-y 속성을 서버로 보냄
+
+            let x = $(this).attr('data-x ');
+            let y = $(this).attr('data-y ');
+            if(confirm('좌석 예매 ㄱㄱ?')){
+                    socket.emit("reserve",{
+                        x,
+                        y,
+                    });
+            }else{
+                alert('취소.');
+            }
+        }
+        // 더미 객체 만드는 이유
+        // 같은 url에 연속적으로 요청이 발생되면 버그
+        // url을 매번 다른 형태로 전달
+        $.getJSON('/seats',{dummy : new Date().getTime()}, (data)=>{
+            // 좌석 만들기  
+            // let line = document.createElement('div');
+            // let $line = $("<div></div>").addClass('line');
+            // 문서 객체 생성 변수 line 추가
+            $.each(data, (indexY, line)=>{
+                let $line = $("<div></div>").addClass('line');
+
+                $.each(line,(indexX,seat)=>{
+                    `
+                    <div class = line>
+                        <div class = seats data-x = "indexX" data-y = "indexY"></div>
+                        </div>
+                    `;
+                let $output = $("<div></div>",{
+                    class :"seat",
+                    "data-x":indexX,
+                    "data-y":indexY,
+                }).appendTo($line);
+
+                // 좌석이 비어있으면 enable 클래스와 click 이벤트 추가
+                if(seat == 1){   // 빈 좌 석
+                    // $output.addClass('enable').click(function(){})
+                    $output.addClass('enable').on('click', onClickSeat);
+                }else if (seat ==2){ // 예 약 좌 석
+                    $output.addClass('disable');
+                }
+                });
+                $line.appendTo('body');
+            });
+        });
+    });
+    </script>
+</html>
