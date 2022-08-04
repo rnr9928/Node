@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body{
+            position: relative;
+            height: 100vh;
+
+        }
+        .content{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            border: 1px solid;
+
+        }
+        #send{
+            position: fixed;
+            bottom: 0;
+            width:  100%;
+            border: 1px solid;
+            box-sizing: border-box;
+            display: flex;
+        }
+        #send #msg{
+            border: 0;
+            box-sizing: border-box;
+            padding: 10px;
+            width: 90%;
+        }
+
+        #send #sendbtn{
+            background-color: blueviolet;
+            border: none;
+            box-sizing: border-box;
+            padding: 10px;
+            width: 10%;
+
+        }
+
+        #messages{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages li{
+            padding: 5px 10px;
+        }
+        #login{
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+        }
+
+        .join_text{
+            background-color: gray;
+        }
+        .leave_text{
+            background-color: aqua;
+            border: 1px solid rgb(11, 98, 128);
+        }
+
+        #main{
+            display: none;
+         
+        }
+    </style>
+</head>
+<div></div>
+<body>
+    <div class="content">
+    <div>까까오톡</div>
+    <div id="login">
+        <p>login</p>
+        <input type="text" id = "username">
+        <button id="loginbtn">Join</button>
+    </div>
+    <div id="main">
+        <select id="rooms">
+            <option value="bird">bird</option>
+            <option value="dog">dog</option>
+        </select>
+        <ul id="messages"></ul>
+        <div id ='send'>
+            <input id = "msg">
+            <button id = sendbtn>send</button>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    const socket = io.connect();
+
+    window.onload = function(){
+        loginbtn.onclick = function(){
+            login.style.display = "none";
+            main.style.display = 'block';
+            const name = username.value;
+            // rooms가 select 태그  selectedIndex 선택 된 옵션 인덱스
+            console.log(rooms.options[0].value);
+            console.log(rooms.selectedIndex);
+            let room = rooms.options[rooms.selectedIndex].value;
+            const socket = io.connect();
+            socket.emit('joinRoom',room, name );
+
+            
+            rooms.onchange = function(e){
+                let el = e.target;
+                console.log(el.selectedIndex);
+                socket.emit('leaveRoom', room, name);
+                room = rooms.options[rooms.selectedIndex].value;
+                socket.emit('joinRoom', room, name);
+            };
+
+            socket.on('joinRoom',(room,name)=>{
+                messages.innerHTML += `
+                <li class="join_text">
+                    야생의 ${name}님이 ${room}에 들어왔어요
+                </li>
+                `;
+            });
+            socket.on("leaveRoom",(room,name)=>{
+                messages.innerHTML += `
+                <li class="leave_text">
+                    야생의 ${name}님이 ${room}에 나갔어요
+                </li>
+                `;
+            });
+
+            socket.on('chat',(name,msg)=>{
+                messages.innerHTML += `
+                <li>
+                    ${name} : ${msg}
+                </li>
+                `;
+            });
+               sendbtn.onclick = function(){
+            socket.emit('chat',room,name,msg.value);
+            msg.value = "";
+        };
+
+        };
+        
+
+    };
+</script>
+</html>
