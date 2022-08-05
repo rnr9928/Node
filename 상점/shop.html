@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<link
+            rel="stylesheet"
+            href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"
+        />
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<body>
+    상점 페이지
+    <img src="https://cdn-icons-png.flaticon.com/512/353/353343.png" alt="">
+    <div class = "content">
+        <ul id="listview" 
+        data-role="listview"
+        data-inset="true"
+        data-filter="true">
+        <li data-role="list-divider">products</li>
+        <% products.forEach(function(item,index){ %>
+            <li class="product" data-index="<%= item.index %>">
+                <a href="#">
+                    <img src="https://cdn-icons-png.flaticon.com/512/353/353343.png" alt=""/>
+                    <h3><%= item.name %></h3>
+                    <h3><%= item.price %>원</h3>
+                    <span class="ui-li-count"><%= item.count %></span>
+                </a>
+                <a href="#" data-icon="heart" data-index="<%= item.index %>"></a>
+            </li>
+        <% }); %>
+        </ul>
+    </div>
+    <script>
+        // document 로드가 됬을때 ready
+        $(document).ready(function (){
+            function changeIcon(target, from, to){
+              //   alert('체크');
+                $(target).removeClass(from).addClass(to);
+            }
+
+            // 갯수를 변경해주는 함수
+            function changeCount(index,count){
+              // $('li[data-index = ' + index + '] .ui-li-count').html(count); // 부모 태그
+                $(".product").eq(index).find(".ui-li-count").html(count);
+            }
+
+            const socket = io.connect();
+            socket.on("count",function(data){
+                changeCount(data.index, data.count);
+            });
+
+            $(".product >a[data-icon]").click(function(){
+                let $this = $(this);
+                let index = $this.attr("data-index");
+                // 클릭했을 때 attr(어트리뷰트 속성 이름, 벨류) 추가
+                if ($this.attr('toggle') != 'off') {
+                    socket.emit('cart',parseInt(index));
+                    changeIcon(this, 'ui-icon-heart','ui-icon-check')
+                    $(this).attr("toggle","off");
+                }
+              else{
+                if(confirm('물건 구매?')){
+                    socket.emit('buy', parseInt(index));
+                  //  $this.parent().remove();
+                    // 해당 태그가 listview 속성인 태그에 listview() 함수를 사용해서 실행할 속성은 매개변수로 전달
+                    $(listview).listview('refresh');
+                } else{
+                    socket.emit('return',parseInt(index));
+                    changeIcon(this, "ui-icon-check", "ui-icon-heart");
+                    $(this).attr("toggle","on");
+                }
+              }
+            });
+        });
+    </script>
+</body>
+</html>
