@@ -1,0 +1,50 @@
+{
+  "name": "login",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "debug": "^4.3.4",
+    "denque": "^2.1.0",
+    "dotenv": "^16.0.1",
+    "dottie": "^2.0.2",
+    "ejs": "^3.1.8",
+    "express": "^4.18.1",
+    "generate-function": "^2.3.1",
+    "iconv-lite": "^0.6.3",
+    "inflection": "^1.13.2",
+    "is-property": "^1.0.2",
+    "lodash": "^4.17.21",
+    "long": "^4.0.0",
+    "lru-cache": "^6.0.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.34",
+    "ms": "^2.1.2",
+    "mysql2": "^2.3.3",
+    "named-placeholders": "^1.1.2",
+    "pg-connection-string": "^2.5.0",
+    "pseudomap": "^1.0.2",
+    "retry-as-promised": "^5.0.0",
+    "safer-buffer": "^2.1.2",
+    "semver": "^7.3.7",
+    "seq-queue": "^0.0.5",
+    "sequelize": "^6.21.4",
+    "sequelize-pool": "^7.1.0",
+    "sqlstring": "^2.3.3",
+    "toposort-class": "^1.0.1",
+    "uuid": "^8.3.2",
+    "validator": "^13.7.0",
+    "wkx": "^0.5.0",
+    "yallist": "^4.0.0"
+  },
+  "scripts": {
+    "start": "nodemon app2.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
